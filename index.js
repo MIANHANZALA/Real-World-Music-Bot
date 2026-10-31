@@ -41,13 +41,13 @@ for (const file of eventFiles) {
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.get('/', (req, res) => {
     const imagePath = path.join(__dirname, 'index.html');
     res.sendFile(imagePath);
 });
-app.listen(port, () => {
-    console.log(`🔗 Listening to GlaceYT : http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+    console.log(`Music Bot server running on port:${port}`);
 });
 
 
