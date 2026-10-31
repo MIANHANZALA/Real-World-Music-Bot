@@ -6,7 +6,6 @@ const PlayerManager = require('./src/player/PlayerManager.js');
 const { printWatermark } = require('./src/config/type.js');
 const intents = [
   GatewayIntentBits.Guilds,
-  GatewayIntentBits.GuildMembers,
   GatewayIntentBits.GuildVoiceStates,
   GatewayIntentBits.GuildMessages
 ];
@@ -54,37 +53,55 @@ app.listen(port, "0.0.0.0", () => {
 });
 
 
-// Discord bot connection
+// Discord connection diagnostics
 
 const token = process.env.TOKEN?.trim();
 
-if (!token) {
-    console.error("❌ DISCORD TOKEN IS MISSING!");
-    process.exit(1);
-}
+console.log("Discord token available:", Boolean(token));
 
 client.once("ready", () => {
     console.log("================================");
-    console.log(`✅ BOT ONLINE: ${client.user.tag}`);
-    console.log(`✅ SERVERS: ${client.guilds.cache.size}`);
+    console.log("✅ DISCORD BOT IS ONLINE");
+    console.log("Bot:", client.user.tag);
+    console.log("Bot ID:", client.user.id);
+    console.log("Servers:", client.guilds.cache.size);
     console.log("================================");
 });
 
-client.on("error", error => {
-    console.error("DISCORD ERROR:", error);
+client.on("shardReady", shardId => {
+    console.log(`✅ Discord Gateway connected. Shard: ${shardId}`);
 });
 
-client.on("shardError", error => {
-    console.error("GATEWAY ERROR:", error);
+client.on("shardError", (error, shardId) => {
+    console.error(`❌ Gateway error on shard ${shardId}:`, error);
 });
 
 client.on("shardDisconnect", (event, shardId) => {
     console.error(
-        `DISCONNECTED: Shard ${shardId}, Code: ${event.code}`
+        `❌ Gateway disconnected. Shard: ${shardId}, Code: ${event.code}`
     );
 });
 
-client.login(token).catch(error => {
-    console.error("❌ LOGIN FAILED:", error);
-    process.exit(1);
+client.on("error", error => {
+    console.error("❌ Discord client error:", error);
 });
+
+client.on("warn", warning => {
+    console.warn("Discord warning:", warning);
+});
+
+if (!token) {
+    console.error("❌ TOKEN is missing from Render Environment!");
+    process.exit(1);
+}
+
+console.log("Connecting to Discord Gateway...");
+
+client.login(token)
+    .then(() => {
+        console.log("Discord login request completed.");
+    })
+    .catch(error => {
+        console.error("❌ DISCORD LOGIN FAILED:", error);
+        process.exit(1);
+    });
