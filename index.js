@@ -41,14 +41,50 @@ for (const file of eventFiles) {
 
 const express = require("express");
 const app = express();
-const port = 3000;
+
+const port = process.env.PORT || 10000;
+
 app.get('/', (req, res) => {
     const imagePath = path.join(__dirname, 'index.html');
     res.sendFile(imagePath);
 });
-app.listen(port, () => {
-    console.log(`🔗 Listening to GlaceYT : http://localhost:${port}`);
+
+app.listen(port, "0.0.0.0", () => {
+    console.log(`Web server running on port ${port}`);
 });
 
 
-client.login(process.env.TOKEN);
+// Discord bot connection
+
+const token = process.env.TOKEN?.trim();
+
+if (!token) {
+    console.error("❌ DISCORD TOKEN IS MISSING!");
+    process.exit(1);
+}
+
+client.once("ready", () => {
+    console.log("================================");
+    console.log(`✅ BOT ONLINE: ${client.user.tag}`);
+    console.log(`✅ SERVERS: ${client.guilds.cache.size}`);
+    console.log("================================");
+});
+
+client.on("error", error => {
+    console.error("DISCORD ERROR:", error);
+});
+
+client.on("shardError", error => {
+    console.error("GATEWAY ERROR:", error);
+});
+
+client.on("shardDisconnect", (event, shardId) => {
+    console.error(
+        `DISCONNECTED: Shard ${shardId}, Code: ${event.code}`
+    );
+});
+
+client.login(token).catch(error => {
+    console.error("❌ LOGIN FAILED:", error);
+    process.exit(1);
+});
