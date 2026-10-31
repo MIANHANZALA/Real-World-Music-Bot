@@ -41,14 +41,40 @@ for (const file of eventFiles) {
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 10000;
 app.get('/', (req, res) => {
     const imagePath = path.join(__dirname, 'index.html');
     res.sendFile(imagePath);
 });
-app.listen(port, () => {
-    console.log(`🔗 Listening to GlaceYT : http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+    console.log(`Web server running on port ${port}`);
 });
 
+// Discord connection monitoring
 
-client.login(process.env.TOKEN);
+client.once("ready", () => {
+    console.log("================================");
+    console.log(`✅ BOT ONLINE: ${client.user.tag}`);
+    console.log(`✅ Connected to ${client.guilds.cache.size} server(s)`);
+    console.log("================================");
+});
+
+client.on("error", error => {
+    console.error("Discord Client Error:", error);
+});
+
+client.on("shardError", error => {
+    console.error("Discord Gateway Error:", error);
+});
+
+const token = process.env.TOKEN?.trim();
+
+if (!token) {
+    console.error("❌ Discord TOKEN is missing!");
+    process.exit(1);
+}
+
+client.login(token).catch(error => {
+    console.error("❌ Discord Login Failed:", error);
+    process.exit(1);
+});
