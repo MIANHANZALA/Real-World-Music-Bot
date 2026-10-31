@@ -41,16 +41,28 @@ for (const file of eventFiles) {
 
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 app.listen(port, "0.0.0.0", () => {
-    console.log(`Music Bot server running on port ${port}`);
+    console.log(`Web server running on port ${port}`);
 });
 
 
 const token = process.env.TOKEN?.trim();
 
-console.log("Discord token loaded:", Boolean(token));
-console.log("Token length:", token?.length || 0);
+if (!token) {
+    console.error("ERROR: Discord TOKEN is missing!");
+    process.exit(1);
+}
 
-client.login(token);
+client.once("ready", () => {
+    console.log("================================");
+    console.log(`✅ BOT ONLINE: ${client.user.tag}`);
+    console.log(`✅ Servers: ${client.guilds.cache.size}`);
+    console.log("================================");
+});
+
+client.login(token).catch(error => {
+    console.error("DISCORD LOGIN FAILED:", error);
+    process.exit(1);
+});
