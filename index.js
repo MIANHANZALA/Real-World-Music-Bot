@@ -51,4 +51,9 @@ app.listen(port, "0.0.0.0", () => {
 });
 
 
-client.login(process.env.TOKEN);
+const token = process.env.TOKEN?.trim();
+
+console.log("Discord token loaded:", Boolean(token));
+console.log("Token length:", token?.length || 0);
+
+client.login(token);
