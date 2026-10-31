@@ -42,12 +42,9 @@ for (const file of eventFiles) {
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-app.get('/', (req, res) => {
-    const imagePath = path.join(__dirname, 'index.html');
-    res.sendFile(imagePath);
-});
+
 app.listen(port, "0.0.0.0", () => {
-    console.log(`Music Bot server running on port:${port}`);
+    console.log(`Music Bot server running on port ${port}`);
 });
 
 
